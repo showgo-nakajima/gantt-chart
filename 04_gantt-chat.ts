@@ -151,24 +151,27 @@ document.addEventListener("DOMContentLoaded", () => {
 // 複数選択行入れ替え
 function multiDrag(elem: HTMLElement) {
   elem.addEventListener("click", (event) => {
-      const target = event.target as HTMLElement;
-      if (target.classList.contains("fixed")) {
-          if (event.ctrlKey) {
-              if (!selectedRows.includes(target)) {
-                  target.classList.add("ui-selected");
-                  selectedRows.push(target);
-              } else {
-                  target.classList.remove("ui-selected");
-                  selectedRows = selectedRows.filter(row => row !== target);
-              }
-          } else {
-              selectedRows.forEach(row => row.classList.remove("ui-selected"));
-              selectedRows = [target];
-              target.classList.add("ui-selected");
-          }
-      }
-  });
+    const target = event.target as HTMLElement;
 
+    if (target.tagName === "TD" && target.parentElement) {
+      const row = target.parentElement;
+      const secondTD = row.querySelector("td:nth-child(2)");
+
+      if (event.ctrlKey) {
+        if (!selectedRows.includes(secondTD)) {
+          secondTD.classList.add("ui-selected");
+          selectedRows.push(secondTD);
+        } else {
+          secondTD.classList.remove("ui-selected");
+          selectedRows = selectedRows.filter((selectedTD) => selectedTD !== secondTD);
+        }
+      } else {
+        selectedRows.forEach((selectedTD) => selectedTD.classList.remove("ui-selected"));
+        selectedRows = [secondTD];
+        secondTD.classList.add("ui-selected");
+      }
+    }
+  });
 }
 
 // インデント処理

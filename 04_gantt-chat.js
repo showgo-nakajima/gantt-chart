@@ -124,21 +124,23 @@ document.addEventListener("DOMContentLoaded", function () {
 function multiDrag(elem) {
     elem.addEventListener("click", function (event) {
         var target = event.target;
-        if (target.classList.contains("fixed")) {
+        if (target.tagName === "TD" && target.parentElement) {
+            var row = target.parentElement;
+            var secondTD_1 = row.querySelector("td:nth-child(2)");
             if (event.ctrlKey) {
-                if (!selectedRows.includes(target)) {
-                    target.classList.add("ui-selected");
-                    selectedRows.push(target);
+                if (!selectedRows.includes(secondTD_1)) {
+                    secondTD_1.classList.add("ui-selected");
+                    selectedRows.push(secondTD_1);
                 }
                 else {
-                    target.classList.remove("ui-selected");
-                    selectedRows = selectedRows.filter(function (row) { return row !== target; });
+                    secondTD_1.classList.remove("ui-selected");
+                    selectedRows = selectedRows.filter(function (selectedTD) { return selectedTD !== secondTD_1; });
                 }
             }
             else {
-                selectedRows.forEach(function (row) { return row.classList.remove("ui-selected"); });
-                selectedRows = [target];
-                target.classList.add("ui-selected");
+                selectedRows.forEach(function (selectedTD) { return selectedTD.classList.remove("ui-selected"); });
+                selectedRows = [secondTD_1];
+                secondTD_1.classList.add("ui-selected");
             }
         }
     });
