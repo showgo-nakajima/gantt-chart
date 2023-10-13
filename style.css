@@ -179,6 +179,7 @@ header{
 }
 
 /* 行選択色 */
-.ui-selected td{
+.ui-selected{
 	background:#b1e3ff !important;
+  cursor: pointer;
 }

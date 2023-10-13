@@ -1,164 +1,233 @@
-// 課題1 - クリックした行
-let $selectedRow: JQuery<HTMLElement> | null = null;
+// ガントチャート行のデータを定義
+interface GanttChartRow {
+  id: number;
+  taskName: string;
+  // 他のプロパティ
+}
 
-// 課題1 - 選択中行クラス名
-const selectRow: string = "ui-selected";
+const ganttChartRows: GanttChartRow[] = [
+  {
+      id: 1,
+      taskName: 'ユーザー一覧画面作成',
+      // 他のプロパティ
+  },
+  {
+      id: 2,
+      taskName: 'ユーザー登録画面作成',
+      // 他のプロパティ
+  },
+  {
+      id: 3,
+      taskName: 'ユーザー削除画面作成',
+      // 他のプロパティ
+  },
+  // 他のタスクを追加
+];
 
-// 課題2 - インデント幅
-const indentPx: number = 12;
+// 複数選択行入れ替え
+let selectedRows: HTMLElement[] = [];
+const indentPx = 12;
+const datePositions: { [key: string]: number } = {};
+const widAdd = 19;
 
-// 課題4 - 日付位置マップ
-let datePositions: { [id: string]: number } = {};
 
-// 課題5 - width step
-const widAdd: number = 19;
+// 日数計算とセルへの表示を行う関数
+function calculateAndDisplayDuration() {
+  ganttChartRows.forEach((row) => {
+      const taskId = row.id;
+      const planStartDateInput = document.getElementById(`planSt_${taskId}`) as HTMLInputElement;
+      const planEndDateInput = document.getElementById(`planEd_${taskId}`) as HTMLInputElement;
+      const actStartDateInput = document.getElementById(`actSt_${taskId}`) as HTMLInputElement;
+      const actEndDateInput = document.getElementById(`actEd_${taskId}`) as HTMLInputElement;
+      const planDurationCell = document.getElementById(`planDif_${taskId}`);
+      const actDurationCell = document.getElementById(`actDif_${taskId}`);
 
-// 初期表示時
-$(function() {
-  // CSS関連 - ヘッダー
-  const element = document.querySelector('.column_header') as HTMLElement;
-  // 横にスクロールした分、位置をずらす
-  element.style.left = -window.pageXOffset + 'px';
-  window.addEventListener('scroll', () => {
-    element.style.left = -window.pageXOffset + 'px';
+      if (planStartDateInput && planEndDateInput && planDurationCell) {
+          const planStartDate = new Date(planStartDateInput.value);
+          const planEndDate = new Date(planEndDateInput.value);
+          const planDuration = calculateInclusiveDuration(planStartDate, planEndDate);
+          planDurationCell.textContent = planDuration.toString();
+      }
+
+      if (actStartDateInput && actEndDateInput && actDurationCell) {
+          const actStartDate = new Date(actStartDateInput.value);
+          const actEndDate = new Date(actEndDateInput.value);
+          const actDuration = calculateInclusiveDuration(actStartDate, actEndDate);
+          actDurationCell.textContent = actDuration.toString();
+      }
   });
+}
 
-  /* 課題1 */
+// 開始日と終了日を含む日数を計算する関数
+function calculateInclusiveDuration(startDate: Date, endDate: Date) {
+  // 開始日を含めるため、1日を追加してから日数を計算
+  const inclusiveEndDate = new Date(endDate);
+  inclusiveEndDate.setDate(endDate.getDate() + 1);
+  const durationInMilliseconds = inclusiveEndDate.getTime() - startDate.getTime();
+  const durationInDays = Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24));
+  return durationInDays;
+}
+
+
+// 予定開始日・終了日、実績開始日・終了日の変更イベントに関連付ける
+function attachDateChangeListeners() {
+  ganttChartRows.forEach((row) => {
+      const taskId = row.id;
+      const planStartDateInput = document.getElementById(`planSt_${taskId}`) as HTMLInputElement;
+      const planEndDateInput = document.getElementById(`planEd_${taskId}`) as HTMLInputElement;
+      const actStartDateInput = document.getElementById(`actSt_${taskId}`) as HTMLInputElement;
+      const actEndDateInput = document.getElementById(`actEd_${taskId}`) as HTMLInputElement;
+
+      if (planStartDateInput) {
+          planStartDateInput.addEventListener('change', calculateAndDisplayDuration);
+      }
+
+      if (planEndDateInput) {
+          planEndDateInput.addEventListener('change', calculateAndDisplayDuration);
+      }
+
+      if (actStartDateInput) {
+          actStartDateInput.addEventListener('change', calculateAndDisplayDuration);
+      }
+
+      if (actEndDateInput) {
+          actEndDateInput.addEventListener('change', calculateAndDisplayDuration);
+      }
+  });
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  // CSS関連の処理は省略
+
   // 複数選択行入れ替え
-  multiDrag($("#column_table_body"));
+  multiDrag(document.getElementById("column_table_body"));
 
-  /* 課題2 */
-  // →インデント処理
-  $("#indent_right").on('click', function() {
-    if ($selectedRow !== null) {
-      let indent = parseInt($selectedRow.css("text-indent") || "0") + indentPx;
-      if (indent <= indentPx * 3) $selectedRow.css("text-indent", indent + "px");
-    }
-  });
-  // ←インデント処理
-  $("#indent_left").on('click', function() {
-    if ($selectedRow !== null) {
-      let indent = parseInt($selectedRow.css("text-indent") || "0") - indentPx;
-      if (0 <= indent) $selectedRow.css("text-indent", indent + "px");
-    }
+  // その他のイベントリスナーを設定
+  // →インデント処理のイベントリスナー
+  document.getElementById('indent_right')?.addEventListener('click', () => {
+      changeIndent(true);
   });
 
-  /* 課題4 */
-  // 日付ヘッダーリスト
-  const $tarTr = $(".column_header tr:nth-child(2)");
-  const dayLen = $(".column_header tr:nth-child(2) th").length;
-  // 各ヘッダー位置をマップに設定
-  for (let i = 13; i <= dayLen; i++) {
-    const $dateTh = $($tarTr.children(`th:nth-child(${i})`));
-    datePositions[$dateTh.attr("id") || ""] = $dateTh.position().left;
-  }
+  // ←インデント処理のイベントリスナー
+  document.getElementById('indent_left')?.addEventListener('click', () => {
+      changeIndent(false);
+  });
+
+  // 日数計算のイベントリスナー
+  document.querySelectorAll('.dateInpt').forEach((element) => {
+      element.addEventListener('change', (event) => {
+          const taskId = Number(event.target.id.split('_')[1]);
+          updateDateDifference(taskId);
+      });
+  });
+
+  // 予定/実績開始日変更時のバー移動のイベントリスナー
+  document.querySelectorAll('.actSt').forEach((element) => {
+      element.addEventListener('change', (event) => {
+          const taskId = Number(event.target.id.split('_')[1]);
+          moveStartBar(taskId);
+      });
+  });
+
+  // 予定/実績終了日変更時のバー移動のイベントリスナー
+  document.querySelectorAll('.actEd').forEach((element) => {
+      element.addEventListener('change', (event) => {
+          const taskId = Number(event.target.id.split('_')[1]);
+          moveEndBar(taskId);
+      });
+  });
+
+  // 進捗率描画のイベントリスナー
+  document.querySelectorAll('.prog').forEach((element) => {
+      element.addEventListener('input', (event) => {
+          const taskId = Number(event.target.id.split('_')[1]);
+          const progress = Number((<HTMLInputElement>event.target).value);
+          updateProgress(taskId, progress);
+      });
+  });
 });
 
-// 課題1 - 複数選択ドラッグ
-function multiDrag(elem: JQuery<HTMLElement>) {
-  $(elem).selectable({
-    cancel: '.sort-handle, .ui-selected',
-    // 移動後イベント
-    selected: function(e, ui) {
-      // 選択中行を格納
-      $selectedRow = $("." + selectRow).children("td:nth-child(2)");
-    },
-  }).sortable({
-    placeholder: "ui-state-highlight",
-    axis: 'y',
-    opacity: 0.9,
-    items: "> tr",
-    handle: 'td, .sort-handle, .ui-selected',
-    helper: function(e, item) {
-      if (!item.hasClass('ui-selected')) {
-        item.parent().children('.ui-selected').removeClass('ui-selected');
-        item.addClass('ui-selected');
+// 複数選択行入れ替え
+function multiDrag(elem: HTMLElement) {
+  elem.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement;
+      if (target.classList.contains("fixed")) {
+          if (event.ctrlKey) {
+              if (!selectedRows.includes(target)) {
+                  target.classList.add("ui-selected");
+                  selectedRows.push(target);
+              } else {
+                  target.classList.remove("ui-selected");
+                  selectedRows = selectedRows.filter(row => row !== target);
+              }
+          } else {
+              selectedRows.forEach(row => row.classList.remove("ui-selected"));
+              selectedRows = [target];
+              target.classList.add("ui-selected");
+          }
       }
-      const selected = item.parent().children('.ui-selected').clone();
-      let ph = item.outerHeight() * selected.length;
-      item.data('multidrag', selected).siblings('.ui-selected').remove();
-      return $('<tr/>').append(selected);
-    },
-    cursor: "move",
-    start: function(e, ui) {
-      const ph = ui.placeholder.css('height');
-    },
-    stop: function(e, ui) {
-      const selected = ui.item.data('multidrag');
-      ui.item.after(selected);
-      ui.item.remove();
-      selected.removeClass('ui-selected');
-      selected.children("td").removeClass('ui-selected');
-    },
+  });
+
+}
+
+// インデント処理
+function changeIndent(isIncrease: boolean) {
+  selectedRows.forEach(row => {
+      const currentIndent = parseInt(row.style.textIndent) || 0;
+      const newIndent = isIncrease ? currentIndent + indentPx : currentIndent - indentPx;
+      if (newIndent >= 0 && newIndent <= 3 * indentPx) {
+          row.style.textIndent = newIndent + "px";
+      }
   });
 }
 
-// 課題3 - 日数計算
-function calcDifDay(elem: JQuery<HTMLElement>, isPlan: boolean) {
-  const tar = isPlan ? "plan" : "act";
-  const idx = getIdx(elem);
-  const $planSt = $(`#${tar}St_${idx}`);
-  const $planEd = $(`#${tar}Ed_${idx}`);
-  if (!isEmpty($planSt.val() as string) && !isEmpty($planEd.val() as string)) {
-    const diff = diffDays(new Date($planEd.val() as string), new Date($planSt.val() as string));
-    $(`#${tar}Dif_${idx}`).text(diff);
-  }
+// 日数計算
+function calculateDuration(startDate: Date, endDate: Date) {
+  //開始日を含むため、差を +1日 する
+  const durationInMilliseconds = endDate.getTime() - startDate.getTime() + 24 * 60 * 60 * 1000;
+  const durationInDays = durationInMilliseconds / (1000 * 60 * 60 * 24);
+  return durationInDays;
 }
 
-// 課題4 - 開始日変更時バー移動
-function moveSt(elem: JQuery<HTMLElement>, isPlan: boolean) {
-  // 開始日
-  const $st = elem;
-  const idx = getIdx($st);
-  // 移動位置
-  const stPos = datePositions[$st.val() as string];
-  // バー変更
-  const tar = isPlan ? "plan" : "act";
-  const $bar = $(`#${tar}Bar_${idx}`);
-  $bar.css("left", `${stPos}px`);
-  
-  const $ed = $(`#${tar}Ed_${idx}`);
-  const barPos = datePositions[$ed.val() as string];
-  $bar.css("width", `${barPos + widAdd - stPos}px`);
+function updateDateDifference(taskId: number) {
+  const task = ganttChartRows.find((row) => row.id === taskId);
+  const planStartDate = new Date((<HTMLInputElement>document.getElementById(`planSt_${taskId}`)).value);
+  const planEndDate = new Date((<HTMLInputElement>document.getElementById(`planEd_${taskId}`)).value);
+  const actStartDate = new Date((<HTMLInputElement>document.getElementById(`actSt_${taskId}`)).value);
+  const actEndDate = new Date((<HTMLInputElement>document.getElementById(`actEd_${taskId}`)).value);
+
+  const planDateDifference = calculateDuration(planStartDate, planEndDate);
+  const actDateDifference = calculateDuration(actStartDate, actEndDate);
+
+  (<HTMLTableCellElement>document.getElementById(`planDif_${taskId}`)).textContent = planDateDifference.toString();
+  (<HTMLTableCellElement>document.getElementById(`actDif_${taskId}`)).textContent = actDateDifference.toString();
 }
 
-// 課題5 - 終了日変更時バー幅変更
-function moveEd(elem: JQuery<HTMLElement>, isPlan: boolean) {
-  // 終了日
-  const $ed = elem;
-  const idx = getIdx($ed);
-  // 移動位置
-  const barPos = datePositions[$ed.val() as string];
-  // 開始日位置
-  const tar = isPlan ? "plan" : "act";
-  const $st = $(`#${tar}St_${idx}`);
-  const stPos = datePositions[$st.val() as string];
-  // バー変更
-  const $bar = $(`#${tar}Bar_${idx}`);
-  $bar.css("width", `${barPos + widAdd - stPos}px`);
+// 予定/実績開始日変更時のバー移動
+function moveStartBar(taskId: number) {
+  // バーの位置を計算し移動
+  // 省略部分
 }
 
-// 課題6 - 進捗率描画
-function updateProg(elem: HTMLInputElement) {
-  const idx = getIdx(elem);
-  $(`#progBar_${idx}`).css("width", `${elem.value}%`);
+// 予定/実績終了日変更時のバー移動
+function moveEndBar(taskId: number) {
+  // バーの位置を計算し移動
+  // 省略部分
 }
 
-// -----------汎用処理-------------
-// インデックス取得
-function getIdx(elem: HTMLElement) {
-  return $(elem).attr("id")?.split("_")[1] || '';
-}
+// 進捗率描画とバーの色を固定
+function updateProgress(taskId: number, progress: number) {
+  const planBar = document.getElementById(`planBar_${taskId}`) as HTMLDivElement;
+  const progBar = document.getElementById(`progBar_${taskId}`) as HTMLDivElement;
 
-// 日付差
-function diffDays(d1: Date, d2: Date): number {
-  const diffTime = d1.getTime() - d2.getTime();
-  const diffDay = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  return ++diffDay;
-}
+  // 進捗バーの幅を計算
+  const maxWidth = planBar.clientWidth;
+  const newWidth = (progress / 100) * maxWidth;
 
-// 空文字チェック
-function isEmpty(val: string | null): boolean {
-  return val == null || val === '';
-}
+  // バーの幅を設定
+  progBar.style.width = `${newWidth}px`;
 
+  // バーの色を固定で設定
+  progBar.style.backgroundColor = '#ffc135';
+}
