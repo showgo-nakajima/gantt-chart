@@ -2,26 +2,20 @@ var ganttChartRows = [
     {
         id: 1,
         taskName: 'ユーザー一覧画面作成',
-        // 他のプロパティ
     },
     {
         id: 2,
         taskName: 'ユーザー登録画面作成',
-        // 他のプロパティ
     },
     {
         id: 3,
         taskName: 'ユーザー削除画面作成',
-        // 他のプロパティ
     },
-    // 他のタスクを追加
 ];
-// 複数選択行入れ替え
 var selectedRows = [];
 var indentPx = 12;
 var datePositions = {};
 var widAdd = 19;
-// 日数計算とセルへの表示を行う関数
 function calculateAndDisplayDuration() {
     ganttChartRows.forEach(function (row) {
         var taskId = row.id;
@@ -45,16 +39,13 @@ function calculateAndDisplayDuration() {
         }
     });
 }
-// 開始日と終了日を含む日数を計算する関数
 function calculateInclusiveDuration(startDate, endDate) {
-    // 開始日を含めるため、1日を追加してから日数を計算
     var inclusiveEndDate = new Date(endDate);
     inclusiveEndDate.setDate(endDate.getDate() + 1);
     var durationInMilliseconds = inclusiveEndDate.getTime() - startDate.getTime();
     var durationInDays = Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24));
     return durationInDays;
 }
-// 予定開始日・終了日、実績開始日・終了日の変更イベントに関連付ける
 function attachDateChangeListeners() {
     ganttChartRows.forEach(function (row) {
         var taskId = row.id;
@@ -77,41 +68,35 @@ function attachDateChangeListeners() {
     });
 }
 document.addEventListener("DOMContentLoaded", function () {
-    // CSS関連の処理は省略
-    var _a, _b;
-    // 複数選択行入れ替え
-    multiDrag(document.getElementById("column_table_body"));
+    // クリック行着色
+    selected(document.getElementById("column_table_body"));
     // その他のイベントリスナーを設定
-    // →インデント処理のイベントリスナー
-    (_a = document.getElementById('indent_right')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', function () {
+    var indentRightButton = document.getElementById('indent_right');
+    var indentLeftButton = document.getElementById('indent_left');
+    indentRightButton === null || indentRightButton === void 0 ? void 0 : indentRightButton.addEventListener('click', function () {
         changeIndent(true);
     });
-    // ←インデント処理のイベントリスナー
-    (_b = document.getElementById('indent_left')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', function () {
+    indentLeftButton === null || indentLeftButton === void 0 ? void 0 : indentLeftButton.addEventListener('click', function () {
         changeIndent(false);
     });
-    // 日数計算のイベントリスナー
     document.querySelectorAll('.dateInpt').forEach(function (element) {
         element.addEventListener('change', function (event) {
             var taskId = Number(event.target.id.split('_')[1]);
             updateDateDifference(taskId);
         });
     });
-    // 予定/実績開始日変更時のバー移動のイベントリスナー
     document.querySelectorAll('.actSt').forEach(function (element) {
         element.addEventListener('change', function (event) {
             var taskId = Number(event.target.id.split('_')[1]);
             moveStartBar(taskId);
         });
     });
-    // 予定/実績終了日変更時のバー移動のイベントリスナー
     document.querySelectorAll('.actEd').forEach(function (element) {
         element.addEventListener('change', function (event) {
             var taskId = Number(event.target.id.split('_')[1]);
             moveEndBar(taskId);
         });
     });
-    // 進捗率描画のイベントリスナー
     document.querySelectorAll('.prog').forEach(function (element) {
         element.addEventListener('input', function (event) {
             var taskId = Number(event.target.id.split('_')[1]);
@@ -120,44 +105,71 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
-// 複数選択行入れ替え
-function multiDrag(elem) {
+//行選択時の処理
+function selected(elem) {
     elem.addEventListener("click", function (event) {
         var target = event.target;
         if (target.tagName === "TD" && target.parentElement) {
             var row = target.parentElement;
-            var secondTD_1 = row.querySelector("td:nth-child(2)");
+            var secondTD_1_1 = row.querySelector("td:nth-child(2)");
+            var AllTD = row.querySelectorAll("td");
             if (event.ctrlKey) {
-                if (!selectedRows.includes(secondTD_1)) {
-                    secondTD_1.classList.add("ui-selected");
-                    selectedRows.push(secondTD_1);
+                if (!selectedRows.includes(secondTD_1_1)) {
+                    AllTD.forEach(function (td) { return td.classList.add("ui-selected"); });
+                    selectedRows.push(AllTD);
                 }
                 else {
-                    secondTD_1.classList.remove("ui-selected");
-                    selectedRows = selectedRows.filter(function (selectedTD) { return selectedTD !== secondTD_1; });
+                    AllTD.forEach(function (td) { return td.classList.remove("ui-selected"); });
+                    selectedRows = selectedRows.filter(function (selectedTD) { return selectedTD !== secondTD_1_1; });
                 }
             }
             else {
                 selectedRows.forEach(function (selectedTD) { return selectedTD.classList.remove("ui-selected"); });
-                selectedRows = [secondTD_1];
-                secondTD_1.classList.add("ui-selected");
+                selectedRows = [secondTD_1_1];
+                AllTD.forEach(function (td) { return td.classList.add("ui-selected"); });
             }
         }
     });
 }
-// インデント処理
+function findParentTR(element) {
+    while (element && element.tagName !== "TR") {
+        element = element.parentElement;
+    }
+    return element;
+}
+function selectRow(target) {
+    var row = findParentTR(target);
+    if (!row) {
+        return;
+    }
+    if (event.ctrlKey) {
+        if (!selectedRows.includes(row)) {
+            row.classList.add("ui-selected");
+            selectedRows.push(row);
+        }
+        else {
+            row.classList.remove("ui-selected");
+            selectedRows = selectedRows.filter(function (selectedRow) { return selectedRow !== row; });
+        }
+    }
+    else {
+        selectedRows.forEach(function (selectedRow) { return selectedRow.classList.remove("ui-selected"); });
+        selectedRows = [row];
+        row.classList.add("ui-selected");
+    }
+}
 function changeIndent(isIncrease) {
     selectedRows.forEach(function (row) {
         var currentIndent = parseInt(row.style.textIndent) || 0;
-        var newIndent = isIncrease ? currentIndent + indentPx : currentIndent - indentPx;
-        if (newIndent >= 0 && newIndent <= 3 * indentPx) {
-            row.style.textIndent = newIndent + "px";
+        if (!isNaN(currentIndent)) {
+            var newIndent = isIncrease ? currentIndent + indentPx : currentIndent - indentPx;
+            if (newIndent >= 0 && newIndent <= 3 * indentPx) {
+                row.style.textIndent = newIndent + "px";
+            }
         }
     });
 }
-// 日数計算
 function calculateDuration(startDate, endDate) {
-    //開始日を含むため、差を +1日 する
     var durationInMilliseconds = endDate.getTime() - startDate.getTime() + 24 * 60 * 60 * 1000;
     var durationInDays = durationInMilliseconds / (1000 * 60 * 60 * 24);
     return durationInDays;
@@ -173,25 +185,64 @@ function updateDateDifference(taskId) {
     document.getElementById("planDif_".concat(taskId)).textContent = planDateDifference.toString();
     document.getElementById("actDif_".concat(taskId)).textContent = actDateDifference.toString();
 }
-// 予定/実績開始日変更時のバー移動
 function moveStartBar(taskId) {
     // バーの位置を計算し移動
-    // 省略部分
 }
-// 予定/実績終了日変更時のバー移動
 function moveEndBar(taskId) {
     // バーの位置を計算し移動
-    // 省略部分
 }
-// 進捗率描画とバーの色を固定
+//バーが伸びたり縮んだりする処理
 function updateProgress(taskId, progress) {
     var planBar = document.getElementById("planBar_".concat(taskId));
     var progBar = document.getElementById("progBar_".concat(taskId));
-    // 進捗バーの幅を計算
     var maxWidth = planBar.clientWidth;
     var newWidth = (progress / 100) * maxWidth;
-    // バーの幅を設定
     progBar.style.width = "".concat(newWidth, "px");
-    // バーの色を固定で設定
     progBar.style.backgroundColor = '#ffc135';
+}
+var tbody = document.getElementById('column_table_body');
+var draggedRow = null;
+function handleDragStart(e) {
+    draggedRow = this;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
+}
+function handleDragOver(e) {
+    if (e.preventDefault) {
+        e.preventDefault();
+    }
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+function handleDragEnter(e) {
+    this.classList.add('over');
+}
+function handleDragLeave(e) {
+    this.classList.remove('over');
+}
+function handleDrop(e) {
+    if (e.stopPropagation) {
+        e.stopPropagation();
+    }
+    if (draggedRow !== this) {
+        tbody.insertBefore(draggedRow, this);
+    }
+    this.classList.remove('over');
+    return false;
+}
+function handleDragEnd() {
+    this.classList.remove('over');
+    draggedRow = null;
+}
+var rows = tbody === null || tbody === void 0 ? void 0 : tbody.querySelectorAll('tr');
+if (rows) {
+    rows.forEach(function (row) {
+        row.draggable = true;
+        row.addEventListener('dragstart', handleDragStart);
+        row.addEventListener('dragover', handleDragOver);
+        row.addEventListener('dragenter', handleDragEnter);
+        row.addEventListener('dragleave', handleDragLeave);
+        row.addEventListener('drop', handleDrop);
+        row.addEventListener('dragend', handleDragEnd);
+    });
 }

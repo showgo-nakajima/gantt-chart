@@ -1,5 +1,11 @@
 @charset "UTF-8";
 
+
+  /* ドラッグ中の要素をスタイル付けるためのCSS */
+  .draggable {
+    cursor: grab;
+    user-drag: none;
+  }
 /* ボディ */
 body{
 	font-size:12px;
@@ -179,7 +185,7 @@ header{
 }
 
 /* 行選択色 */
-.ui-selected{
+.ui-selected {
 	background:#b1e3ff !important;
   cursor: pointer;
 }

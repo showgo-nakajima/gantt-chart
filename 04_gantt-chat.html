@@ -1,30 +1,21 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-	<head>
-		<!-- タイトル -->
-	    <title>ガントチャート</title>
-	    <!-- エンコード -->
-	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	    <!-- CSS -->
-	    <link href="style.css" rel="styleSheet" type="text/css">
-	    <!-- JAVASCRIPT -->
-	    <script src="04_gantt-chat.js"></script>
-	</head>
-	
-	<body>
-		
-		<!-- ヘッダー -->
 		<header>
+            <link rel="stylesheet" href="style.css">
 			<!-- インデント変更ボタンエリア -->
 			<span id="indentDiv">
 				<button id="indent_left">←</button>
 				<button id="indent_right">→</button>
 			</span>
 		</header>
-		
-		<!-- ガントチャート -->
-		<main>
-			<!-- テーブルヘッダー ---------------------------------------------------------------------->
+<style>
+  /* ドラッグ中の要素をスタイル付けるためのCSS */
+  .draggable {
+    cursor: grab;
+    user-drag: none;
+  }
+</style>
+<body>
 			<table class="column_header column_table">
 				<thead>
 					<tr>
@@ -97,53 +88,52 @@
 					</tr>
 				</thead>
 			</table>
-			
-			<!-- テーブルボディ ---------------------------------------------------------------------->
-			<table class="column_body column_table">
-				<tbody id="column_table_body">
-					<tr>
-						<!-- 入力列 -->
-						<td class="fixed">1</td>
-						<td class="fixed task_title" >ユーザー一覧画面作成</td>
-						<td>Aさん</td>
-						<td>
-							<input type="range" step="10" value="0" id="prog_1" class="prog" min="0" max="100">
-						</td>
-						<td>進行中</td>
-						<td>
-							<input type="date" id="planSt_1" class="planSt dateInpt">
-						</td>
-						<td>
-							<input type="date" id="planEd_1" class="planEd dateInpt">
-						</td>
-						<td id="planDif_1"></td>
-						<td>
-							<input type="date" id="actSt_1" class="actSt dateInpt">
-						</td>
-						<td>
-							<input type="date" id="actEd_1" class="actEd dateInpt">
-						</td>
-						<td id="actDif_1"></td>
-						<td></td>
-						<!-- 日付列 -->
-						<td class="col_day">
-							<div id="planBar_1" class="planBar bar">
-								<div id="progBar_1" class="progBar"></div>
-							</div>
-							<div id="actBar_1" class="actBar bar"></div>
-						</td>
-						<td class="col_day"></td>
-						<td class="col_day"></td>
-						<td class="col_day"></td>
-						<td class="col_day"></td>
-						<td class="col_day"></td>
-						<td class="col_day"></td>
-						<td class="col_day"></td>
-						<td class="col_day"></td>
-						<td class="col_day"></td>
-						<td class="col_day"></td>
-					</tr>
-					<tr>
+
+<table class="column_body column_table">
+  <tbody id="column_table_body">
+    <tr class="draggable" draggable="true">
+      <!-- 入力列 -->
+      <td class="fixed">1</td>
+      <td class="fixed task_title">ユーザー一覧画面作成</td>
+      <td>Aさん</td>
+      <td>
+        <input type="range" step="10" value="0" id="prog_1" class="prog" min="0" max="100">
+      </td>
+      <td>進行中</td>
+      <td>
+        <input type="date" id="planSt_1" class="planSt dateInpt">
+      </td>
+      <td>
+        <input type="date" id="planEd_1" class="planEd dateInpt">
+      </td>
+      <td id="planDif_1"></td>
+      <td>
+        <input type="date" id="actSt_1" class="actSt dateInpt">
+      </td>
+      <td>
+        <input type="date" id="actEd_1" class="actEd dateInpt">
+      </td>
+      <td id="actDif_1"></td>
+      <td></td>
+      <!-- 日付列 -->
+      <td class="col_day">
+        <div id="planBar_1" class="planBar bar">
+          <div id="progBar_1" class="progBar"></div>
+        </div>
+        <div id="actBar_1" class "actBar bar"></div>
+      </td>
+      <td class="col_day"></td>
+      <td class="col_day"></td>
+      <td class="col_day"></td>
+      <td class="col_day"></td>
+      <td class="col_day"></td>
+      <td class="col_day"></td>
+      <td class="col_day"></td>
+      <td class="col_day"></td>
+      <td class="col_day"></td>
+      <td class="col_day"></td>
+    </tr>
+    					<tr>
 						<!-- 入力列 -->
 						<td class="fixed">2</td>
 						<td class="fixed task_title">ユーザー登録画面作成</td>
@@ -227,8 +217,8 @@
 						<td class="col_day"></td>
 						<td class="col_day"></td>
 					</tr>
-				</tbody>
-			</table>
-		</main>
-	</body>
+  </tbody>
+</table>
+<script src="04_gantt-chat.js"></script>
+</body>
 </html>
