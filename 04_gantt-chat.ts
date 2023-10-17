@@ -158,14 +158,15 @@ function selected(elem: HTMLElement): void {
           selectedRows = selectedRows.filter((selectedTD) => selectedTD !== secondTD_1);
         }
       } else {
-        // Ctrl キーが押されていない場合、すべての選択行を削除し、新しい行を選択
-        selectedRows.forEach((selectedTD) => selectedTD.classList.remove("ui-selected"));
-        selectedRows = [secondTD_1];
+        // Ctrl キーが押されていない場合、すべての選択行をクリアして新しい行を選択
+        selectedRows.forEach((selectedTD) => selectedTD.forEach((td) => td.classList.remove("ui-selected")));
+        selectedRows = [AllTD];
         AllTD.forEach((td) => td.classList.add("ui-selected"));
       }
     }
   });
 }
+
 
 // 親の 'TR' 要素を検索する関数
 function findParentTR(element: HTMLElement): HTMLElement | null {

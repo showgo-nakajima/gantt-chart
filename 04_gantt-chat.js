@@ -134,9 +134,9 @@ function selected(elem) {
                 }
             }
             else {
-                // Ctrl キーが押されていない場合、すべての選択行を削除し、新しい行を選択
-                selectedRows.forEach(function (selectedTD) { return selectedTD.classList.remove("ui-selected"); });
-                selectedRows = [secondTD_1_1];
+                // Ctrl キーが押されていない場合、すべての選択行をクリアして新しい行を選択
+                selectedRows.forEach(function (selectedTD) { return selectedTD.forEach(function (td) { return td.classList.remove("ui-selected"); }); });
+                selectedRows = [AllTD];
                 AllTD.forEach(function (td) { return td.classList.add("ui-selected"); });
             }
         }
