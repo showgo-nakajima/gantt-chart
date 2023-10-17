@@ -231,20 +231,34 @@ function calculateDuration(startDate: Date, endDate: Date): number {
 
 //日付の差分を計算し、表示を更新する関数
 function updateDateDifference(taskId: number): void {
-  const task = ganttChartRows.find((row) => row.id === taskId);//タスク情報を取得
-  const planStartDate = new Date((document.getElementById(`planSt_${taskId}`) as HTMLInputElement).value);//予定開始日を取得
-  const planEndDate = new Date((document.getElementById(`planEd_${taskId}`) as HTMLInputElement).value);//予定終了日を取得
-  const actStartDate = new Date((document.getElementById(`actSt_${taskId}`) as HTMLInputElement).value);//実績開始日を取得
-  const actEndDate = new Date((document.getElementById(`actEd_${taskId}`) as HTMLInputElement).value);//実績終了日を取得
+  const task = ganttChartRows.find((row) => row.id === taskId);
+  const planStartDate = new Date((document.getElementById(`planSt_${taskId}`) as HTMLInputElement).value);
+  const planEndDate = new Date((document.getElementById(`planEd_${taskId}`) as HTMLInputElement).value);
+  const actStartDate = new Date((document.getElementById(`actSt_${taskId}`) as HTMLInputElement).value);
+  const actEndDate = new Date((document.getElementById(`actEd_${taskId}`) as HTMLInputElement).value);
 
-  //予定および実績の日数差を計算
-  const planDateDifference = calculateDuration(planStartDate, planEndDate);
-  const actDateDifference = calculateDuration(actStartDate, actEndDate);
+  let planDateDifference = calculateDuration(planStartDate, planEndDate);
+  let actDateDifference = calculateDuration(actStartDate, actEndDate);
 
-  //画面に計算結果を表示
+  // 日数が0未満の場合
+  if (planDateDifference < 0) {
+    alert("日数は0未満にすることはできません。");
+    planDateDifference = 0; // 日数を0に設定
+    (document.getElementById(`planSt_${taskId}`) as HTMLInputElement).value = ""; // 予定開始日を空欄に
+    (document.getElementById(`planEd_${taskId}`) as HTMLInputElement).value = ""; // 予定終了日を空欄に
+  }
+
+  if (actDateDifference < 0) {
+    alert("日数は0未満にすることはできません。");
+    actDateDifference = 0; // 日数を0に設定
+    (document.getElementById(`actSt_${taskId}`) as HTMLInputElement).value = ""; // 実績開始日を空欄に
+    (document.getElementById(`actEd_${taskId}`) as HTMLInputElement).value = ""; // 実績終了日を空欄に
+  }
+
   (document.getElementById(`planDif_${taskId}`) as HTMLElement).textContent = planDateDifference.toString();
   (document.getElementById(`actDif_${taskId}`) as HTMLElement).textContent = actDateDifference.toString();
 }
+
 
 function moveStartBar(taskId: number): void {
   // バーの位置を計算し移動

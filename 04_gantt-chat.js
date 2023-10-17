@@ -200,15 +200,26 @@ function calculateDuration(startDate, endDate) {
 }
 //日付の差分を計算し、表示を更新する関数
 function updateDateDifference(taskId) {
-    var task = ganttChartRows.find(function (row) { return row.id === taskId; }); //タスク情報を取得
-    var planStartDate = new Date(document.getElementById("planSt_".concat(taskId)).value); //予定開始日を取得
-    var planEndDate = new Date(document.getElementById("planEd_".concat(taskId)).value); //予定終了日を取得
-    var actStartDate = new Date(document.getElementById("actSt_".concat(taskId)).value); //実績開始日を取得
-    var actEndDate = new Date(document.getElementById("actEd_".concat(taskId)).value); //実績終了日を取得
-    //予定および実績の日数差を計算
+    var task = ganttChartRows.find(function (row) { return row.id === taskId; });
+    var planStartDate = new Date(document.getElementById("planSt_".concat(taskId)).value);
+    var planEndDate = new Date(document.getElementById("planEd_".concat(taskId)).value);
+    var actStartDate = new Date(document.getElementById("actSt_".concat(taskId)).value);
+    var actEndDate = new Date(document.getElementById("actEd_".concat(taskId)).value);
     var planDateDifference = calculateDuration(planStartDate, planEndDate);
     var actDateDifference = calculateDuration(actStartDate, actEndDate);
-    //画面に計算結果を表示
+    // 日数が0未満の場合
+    if (planDateDifference < 0) {
+        alert("日数は0未満にすることはできません。");
+        planDateDifference = 0; // 日数を0に設定
+        document.getElementById("planSt_".concat(taskId)).value = ""; // 予定開始日を空欄に
+        document.getElementById("planEd_".concat(taskId)).value = ""; // 予定終了日を空欄に
+    }
+    if (actDateDifference < 0) {
+        alert("日数は0未満にすることはできません。");
+        actDateDifference = 0; // 日数を0に設定
+        document.getElementById("actSt_".concat(taskId)).value = ""; // 実績開始日を空欄に
+        document.getElementById("actEd_".concat(taskId)).value = ""; // 実績終了日を空欄に
+    }
     document.getElementById("planDif_".concat(taskId)).textContent = planDateDifference.toString();
     document.getElementById("actDif_".concat(taskId)).textContent = actDateDifference.toString();
 }
