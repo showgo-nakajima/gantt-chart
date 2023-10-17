@@ -134,9 +134,9 @@ function selected(elem) {
                 }
             }
             else {
-                // Ctrl キーが押されていない場合、すべての選択行をクリアして新しい行を選択
-                selectedRows.forEach(function (selectedTD) { return selectedTD.forEach(function (td) { return td.classList.remove("ui-selected"); }); });
-                selectedRows = [AllTD];
+                // Ctrl キーが押されていない場合、すべての選択行を削除し、新しい行を選択
+                selectedRows.forEach(function (selectedTD) { return selectedTD.classList.remove("ui-selected"); });
+                selectedRows = [secondTD_1_1];
                 AllTD.forEach(function (td) { return td.classList.add("ui-selected"); });
             }
         }
@@ -201,27 +201,49 @@ function calculateDuration(startDate, endDate) {
 //日付の差分を計算し、表示を更新する関数
 function updateDateDifference(taskId) {
     var task = ganttChartRows.find(function (row) { return row.id === taskId; });
-    var planStartDate = new Date(document.getElementById("planSt_".concat(taskId)).value);
-    var planEndDate = new Date(document.getElementById("planEd_".concat(taskId)).value);
-    var actStartDate = new Date(document.getElementById("actSt_".concat(taskId)).value);
-    var actEndDate = new Date(document.getElementById("actEd_".concat(taskId)).value);
+    var planStartDateInput = document.getElementById("planSt_".concat(taskId));
+    var planEndDateInput = document.getElementById("planEd_".concat(taskId));
+    var actStartDateInput = document.getElementById("actSt_".concat(taskId));
+    var actEndDateInput = document.getElementById("actEd_".concat(taskId));
+    var planDurationCell = document.getElementById("planDif_".concat(taskId));
+    var actDurationCell = document.getElementById("actDif_".concat(taskId));
+    var planStartDate = new Date(planStartDateInput.value);
+    var planEndDate = new Date(planEndDateInput.value);
+    var actStartDate = new Date(actStartDateInput.value);
+    var actEndDate = new Date(actEndDateInput.value);
     var planDateDifference = calculateDuration(planStartDate, planEndDate);
     var actDateDifference = calculateDuration(actStartDate, actEndDate);
-    // 日数が0未満の場合
-    if (planDateDifference < 0) {
-        alert("日数は0未満にすることはできません。");
-        planDateDifference = 0; // 日数を0に設定
-        document.getElementById("planSt_".concat(taskId)).value = ""; // 予定開始日を空欄に
-        document.getElementById("planEd_".concat(taskId)).value = ""; // 予定終了日を空欄に
+    // 日数がNaNの場合、0に設定
+    if (isNaN(planDateDifference)) {
+        planDurationCell.textContent = '0';
     }
-    if (actDateDifference < 0) {
-        alert("日数は0未満にすることはできません。");
-        actDateDifference = 0; // 日数を0に設定
-        document.getElementById("actSt_".concat(taskId)).value = ""; // 実績開始日を空欄に
-        document.getElementById("actEd_".concat(taskId)).value = ""; // 実績終了日を空欄に
+    else {
+        // 日数が0未満の場合、0に設定
+        if (planDateDifference < 0) {
+            alert("日数は0未満にすることはできません。");
+            planDurationCell.textContent = '0';
+            planStartDateInput.value = "";
+            planEndDateInput.value = "";
+        }
+        else {
+            planDurationCell.textContent = planDateDifference.toString();
+        }
     }
-    document.getElementById("planDif_".concat(taskId)).textContent = planDateDifference.toString();
-    document.getElementById("actDif_".concat(taskId)).textContent = actDateDifference.toString();
+    // 同様に実績の日数も処理
+    if (isNaN(actDateDifference)) {
+        actDurationCell.textContent = '0';
+    }
+    else {
+        if (actDateDifference < 0) {
+            alert("日数は0未満にすることはできません.");
+            actDurationCell.textContent = '0';
+            actStartDateInput.value = "";
+            actEndDateInput.value = "";
+        }
+        else {
+            actDurationCell.textContent = actDateDifference.toString();
+        }
+    }
 }
 function moveStartBar(taskId) {
     // バーの位置を計算し移動

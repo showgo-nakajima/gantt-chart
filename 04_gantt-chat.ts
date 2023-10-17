@@ -158,15 +158,14 @@ function selected(elem: HTMLElement): void {
           selectedRows = selectedRows.filter((selectedTD) => selectedTD !== secondTD_1);
         }
       } else {
-        // Ctrl キーが押されていない場合、すべての選択行をクリアして新しい行を選択
-        selectedRows.forEach((selectedTD) => selectedTD.forEach((td) => td.classList.remove("ui-selected")));
-        selectedRows = [AllTD];
+        // Ctrl キーが押されていない場合、すべての選択行を削除し、新しい行を選択
+        selectedRows.forEach((selectedTD) => selectedTD.classList.remove("ui-selected"));
+        selectedRows = [secondTD_1];
         AllTD.forEach((td) => td.classList.add("ui-selected"));
       }
     }
   });
 }
-
 
 // 親の 'TR' 要素を検索する関数
 function findParentTR(element: HTMLElement): HTMLElement | null {
@@ -232,31 +231,50 @@ function calculateDuration(startDate: Date, endDate: Date): number {
 //日付の差分を計算し、表示を更新する関数
 function updateDateDifference(taskId: number): void {
   const task = ganttChartRows.find((row) => row.id === taskId);
-  const planStartDate = new Date((document.getElementById(`planSt_${taskId}`) as HTMLInputElement).value);
-  const planEndDate = new Date((document.getElementById(`planEd_${taskId}`) as HTMLInputElement).value);
-  const actStartDate = new Date((document.getElementById(`actSt_${taskId}`) as HTMLInputElement).value);
-  const actEndDate = new Date((document.getElementById(`actEd_${taskId}`) as HTMLInputElement).value);
+  const planStartDateInput = document.getElementById(`planSt_${taskId}`) as HTMLInputElement;
+  const planEndDateInput = document.getElementById(`planEd_${taskId}`) as HTMLInputElement;
+  const actStartDateInput = document.getElementById(`actSt_${taskId}`) as HTMLInputElement;
+  const actEndDateInput = document.getElementById(`actEd_${taskId}`) as HTMLInputElement;
 
-  let planDateDifference = calculateDuration(planStartDate, planEndDate);
-  let actDateDifference = calculateDuration(actStartDate, actEndDate);
+  const planDurationCell = document.getElementById(`planDif_${taskId}`) as HTMLElement;
+  const actDurationCell = document.getElementById(`actDif_${taskId}`) as HTMLElement;
 
-  // 日数が0未満の場合
-  if (planDateDifference < 0) {
-    alert("日数は0未満にすることはできません。");
-    planDateDifference = 0; // 日数を0に設定
-    (document.getElementById(`planSt_${taskId}`) as HTMLInputElement).value = ""; // 予定開始日を空欄に
-    (document.getElementById(`planEd_${taskId}`) as HTMLInputElement).value = ""; // 予定終了日を空欄に
+  const planStartDate = new Date(planStartDateInput.value);
+  const planEndDate = new Date(planEndDateInput.value);
+  const actStartDate = new Date(actStartDateInput.value);
+  const actEndDate = new Date(actEndDateInput.value);
+
+  const planDateDifference = calculateDuration(planStartDate, planEndDate);
+  const actDateDifference = calculateDuration(actStartDate, actEndDate);
+
+  // 日数がNaNの場合、0に設定
+  if (isNaN(planDateDifference)) {
+    planDurationCell.textContent = '0';
+  } else {
+    // 日数が0未満の場合、0に設定
+    if (planDateDifference < 0) {
+      alert("日数は0未満にすることはできません。");
+      planDurationCell.textContent = '0';
+      planStartDateInput.value = "";
+      planEndDateInput.value = "";
+    } else {
+      planDurationCell.textContent = planDateDifference.toString();
+    }
   }
 
-  if (actDateDifference < 0) {
-    alert("日数は0未満にすることはできません。");
-    actDateDifference = 0; // 日数を0に設定
-    (document.getElementById(`actSt_${taskId}`) as HTMLInputElement).value = ""; // 実績開始日を空欄に
-    (document.getElementById(`actEd_${taskId}`) as HTMLInputElement).value = ""; // 実績終了日を空欄に
+  // 同様に実績の日数も処理
+  if (isNaN(actDateDifference)) {
+    actDurationCell.textContent = '0';
+  } else {
+    if (actDateDifference < 0) {
+      alert("日数は0未満にすることはできません.");
+      actDurationCell.textContent = '0';
+      actStartDateInput.value = "";
+      actEndDateInput.value = "";
+    } else {
+      actDurationCell.textContent = actDateDifference.toString();
+    }
   }
-
-  (document.getElementById(`planDif_${taskId}`) as HTMLElement).textContent = planDateDifference.toString();
-  (document.getElementById(`actDif_${taskId}`) as HTMLElement).textContent = actDateDifference.toString();
 }
 
 
