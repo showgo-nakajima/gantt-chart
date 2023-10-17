@@ -175,36 +175,23 @@ function findParentTR(element: HTMLElement): HTMLElement | null {
   return element;
 }
 
+// 行選択時の処理
 function selectRow(target: HTMLElement): void {
   const row: HTMLElement | null = findParentTR(target);
 
-  if (!row) {//row が null なら何もしない。
+  if (!row) {
     return;
   }
 
-  //-------------------
-  // 行クリック時の処理 |
-  //-------------------
+  const allRows = tbody?.querySelectorAll('tr.ui-selected');
+  allRows?.forEach((tr) => {
+    tr.classList.remove("ui-selected");
+  });
 
-  //Ctrlキーが押されている場合と押されていない場合の行選択処理
-  if (event.ctrlKey) {
-    //Ctrlキーが押されている場合（複数行の選択）
-    if (!selectedRows.includes(row)) {
-      //選択中の行リストに追加された行を含まない場合
-      row.classList.add("ui-selected");//対象行を選択状態にする
-      selectedRows.push(row);//選択中の行リストに追加。
-    } else {
-      //選択中の行リストに含まれている場合（選択解除）
-      row.classList.remove("ui-selected");//対象行の選択状態を解除
-      selectedRows = selectedRows.filter((selectedRow) => selectedRow !== row);//選択中の行リストから対象行を削除
-    }
-  } else {
-    // Ctrlキーが押されていない場合（新たな行を選択し、他の選択を解除）
-    selectedRows.forEach((selectedRow) => selectedRow.classList.remove("ui-selected"));//既存の選択中の行の選択を解除
-    selectedRows = [row];//選択中の行リストを新たな行で上書き
-    row.classList.add("ui-selected");//[END]対象行を選択状態にする
-  }
+  // 選択された行に ui-selected クラスを追加
+  row.classList.add("ui-selected");
 }
+
 
 // インデント（行のレベル）を変更する関数
 function changeIndent(isIncrease: boolean) {
