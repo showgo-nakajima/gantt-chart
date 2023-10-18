@@ -118,27 +118,11 @@ function selected(elem) {
         // クリックされた要素が 'TD' タグであることを確認し、親要素が存在する場合
         if (target.tagName === "TD" && target.parentElement) {
             var row = target.parentElement;
-            var secondTD_1_1 = row.querySelector("td:nth-child(2)");
-            var AllTD = row.querySelectorAll("td");
-            // Ctrl キーが押された場合の処理
-            if (event.ctrlKey) {
-                if (!selectedRows.includes(secondTD_1_1)) {
-                    // すべての 'TD' 要素に 'ui-selected' クラスを追加し、選択行に追加
-                    AllTD.forEach(function (td) { return td.classList.add("ui-selected"); });
-                    selectedRows.push(AllTD);
-                }
-                else {
-                    // すべての 'TD' 要素から 'ui-selected' クラスを削除し、選択行から削除
-                    AllTD.forEach(function (td) { return td.classList.remove("ui-selected"); });
-                    selectedRows = selectedRows.filter(function (selectedTD) { return selectedTD !== secondTD_1_1; });
-                }
-            }
-            else {
-                // Ctrl キーが押されていない場合、すべての選択行を削除し、新しい行を選択
-                selectedRows.forEach(function (selectedTD) { return selectedTD.classList.remove("ui-selected"); });
-                selectedRows = [secondTD_1_1];
-                AllTD.forEach(function (td) { return td.classList.add("ui-selected"); });
-            }
+            var secondTD_1 = row.querySelector("td:nth-child(2)");
+            var TR = row.querySelectorAll("td");
+            selectedRows.forEach(function (selectedTD) { return selectedTD.classList.remove("ui-selected"); });
+            selectedRows = [secondTD_1];
+            TR.forEach(function (td) { return td.classList.add("ui-selected"); });
         }
     });
 }

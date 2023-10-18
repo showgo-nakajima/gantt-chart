@@ -144,28 +144,17 @@ function selected(elem: HTMLElement): void {
     if (target.tagName === "TD" && target.parentElement) {
       const row: HTMLElement = target.parentElement;
       const secondTD_1: HTMLElement | null = row.querySelector("td:nth-child(2)");
-      const AllTD: NodeListOf<HTMLElement> = row.querySelectorAll("td");
+      const TR: NodeListOf<HTMLElement> = row.querySelectorAll("td");
 
-      // Ctrl キーが押された場合の処理
-      if (event.ctrlKey) {
-        if (!selectedRows.includes(secondTD_1)) {
-          // すべての 'TD' 要素に 'ui-selected' クラスを追加し、選択行に追加
-          AllTD.forEach((td) => td.classList.add("ui-selected"));
-          selectedRows.push(AllTD);
-        } else {
-          // すべての 'TD' 要素から 'ui-selected' クラスを削除し、選択行から削除
-          AllTD.forEach((td) => td.classList.remove("ui-selected"));
-          selectedRows = selectedRows.filter((selectedTD) => selectedTD !== secondTD_1);
-        }
-      } else {
-        // Ctrl キーが押されていない場合、すべての選択行を削除し、新しい行を選択
-        selectedRows.forEach((selectedTD) => selectedTD.classList.remove("ui-selected"));
-        selectedRows = [secondTD_1];
-        AllTD.forEach((td) => td.classList.add("ui-selected"));
-      }
+      selectedRows.forEach((selectedTD) => selectedTD.classList.remove("ui-selected"));
+      selectedRows = [secondTD_1];
+      TR.forEach((td) => td.classList.add("ui-selected"));
     }
   });
 }
+
+
+
 
 // 親の 'TR' 要素を検索する関数
 function findParentTR(element: HTMLElement): HTMLElement | null {
