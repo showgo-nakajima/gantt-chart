@@ -111,6 +111,24 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+/*
+一応下記も残しておく（バックアップの為）141~157
+*/
+// 行を選択した際の処理
+// function selected(elem: HTMLElement): void {
+//   elem.addEventListener("click", (event) => {
+//     const target: HTMLElement = event.target as HTMLElement;
+//     // クリックされた要素が 'TD' タグであることを確認し、親要素が存在する場合
+//     if (target.tagName === "TD" && target.parentElement) {
+//       const row: HTMLElement = target.parentElement;
+//       const secondTD_1: HTMLElement | null = row.querySelector("td:nth-child(2)");
+//       const TR: NodeListOf<HTMLElement> = row.querySelectorAll("td");
+//       selectedRows.forEach((selectedTD) => selectedTD.classList.remove("ui-selected"));
+//       selectedRows = [secondTD_1];
+//       TR.forEach((td) => td.classList.add("ui-selected"));
+//     }
+//   });
+// }
 // 行を選択した際の処理
 function selected(elem) {
     elem.addEventListener("click", function (event) {
@@ -120,7 +138,12 @@ function selected(elem) {
             var row = target.parentElement;
             var secondTD_1 = row.querySelector("td:nth-child(2)");
             var TR = row.querySelectorAll("td");
-            selectedRows.forEach(function (selectedTD) { return selectedTD.classList.remove("ui-selected"); });
+            if (!event.ctrlKey) {
+                // Ctrlキーが押されていない場合、一旦すべての行から "ui-selected" クラスを削除
+                var allRows = document.querySelectorAll("tr");
+                allRows.forEach(function (r) { return r.querySelectorAll("td.ui-selected").forEach(function (td) { return td.classList.remove("ui-selected"); }); });
+            }
+            // クリックされた行に "ui-selected" クラスを追加
             selectedRows = [secondTD_1];
             TR.forEach(function (td) { return td.classList.add("ui-selected"); });
         }
