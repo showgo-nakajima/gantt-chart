@@ -252,7 +252,7 @@ function updateDateDifference(taskId: number): void {
     planDurationCell.textContent = '0';
   } else {
     // 日数が0未満の場合、0に設定
-    if (planDateDifference < 0) {
+    if (planDateDifference <= 0) {
       alert("日数は0未満にすることはできません。");
       planDurationCell.textContent = '0';
       planStartDateInput.value = "";
@@ -266,7 +266,7 @@ function updateDateDifference(taskId: number): void {
   if (isNaN(actDateDifference)) {
     actDurationCell.textContent = '0';
   } else {
-    if (actDateDifference < 0) {
+    if (actDateDifference <= 0) {
       alert("日数は0未満にすることはできません.");
       actDurationCell.textContent = '0';
       actStartDateInput.value = "";
