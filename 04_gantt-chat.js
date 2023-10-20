@@ -187,7 +187,6 @@ function selectRow(target) {
     // 選択された行に ui-selected クラスを追加
     row.classList.add("ui-selected");
 }
-/*---------------------ここから----------------------------*/
 //インデント（行のレベル）を変更する関数
 //行を選択した際の処理
 function selected(elem) {
@@ -213,7 +212,6 @@ function selected(elem) {
         }
     });
 }
-/*----------------------ここまで------------------------ */
 //時間換算
 function calculateDuration(startDate, endDate) {
     var durationInMilliseconds = endDate.getTime() - startDate.getTime() + 24 * 60 * 60 * 1000;

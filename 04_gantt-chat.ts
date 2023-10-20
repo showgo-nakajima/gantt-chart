@@ -227,7 +227,6 @@ function selectRow(target: HTMLElement): void {
   row.classList.add("ui-selected");
 }
 
-/*---------------------ここから----------------------------*/
 //インデント（行のレベル）を変更する関数
 //行を選択した際の処理
 function selected(elem: HTMLElement): void{
@@ -256,9 +255,6 @@ function selected(elem: HTMLElement): void{
   }
  })
 }
-
-
-/*----------------------ここまで------------------------ */
 
 //時間換算
 function calculateDuration(startDate: Date, endDate: Date): number {
