@@ -157,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // }
 
 // 行を選択した際の処理
+// 行を選択した際の処理
 function selected(elem: HTMLElement): void {
  elem.addEventListener("click", (event) => {
    const target: HTMLElement = event.target as HTMLElement;
@@ -170,15 +171,36 @@ function selected(elem: HTMLElement): void {
      if (!event.ctrlKey) {
        // Ctrlキーが押されていない場合、一旦すべての行から "ui-selected" クラスを削除
        const allRows: NodeListOf<HTMLElement> = document.querySelectorAll("tr");
-       allRows.forEach((r) => r.querySelectorAll("td.ui-selected").forEach((td) => td.classList.remove("ui-selected")));
+       allRows.forEach((r) => r.querySelectorAll("td.ui-selected").forEach((td) => td.classList.remove("ui-selected"));
+
+       // Ctrlキーが押されていない場合、選択された行を空にする
+       selectedRows = [];
      }
 
      // クリックされた行に "ui-selected" クラスを追加
-     selectedRows = [secondTD_1];
      TR.forEach((td) => td.classList.add("ui-selected"));
+
+     // クリックされた行の情報を selectedRows に追加
+     selectedRows.push(secondTD_1);
    }
  });
 }
+
+// インデント（行のレベル）を変更する関数
+function changeIndent(isIncrease: boolean) {
+ selectedRows.forEach((row) => {
+   const currentIndent = parseInt(row.style.textIndent) || 0; // 現在のインデントを取得（ない場合は 0）
+   if (!isNaN(currentIndent)) {
+     // 現在のインデントが数値である場合
+     const newIndent = isIncrease ? currentIndent + indentPx : currentIndent - indentPx; // 新しいインデントを計算
+     if (newIndent >= 0 && newIndent <= 3 * indentPx) {
+       // 新しいインデントが許容範囲内である場合
+       row.style.textIndent = newIndent + "px"; // 新しいインデントを設定
+     }
+   }
+ });
+}
+
 
 // 親の 'TR' 要素を検索する関数
 function findParentTR(element: HTMLElement): HTMLElement | null {
@@ -205,21 +227,38 @@ function selectRow(target: HTMLElement): void {
   row.classList.add("ui-selected");
 }
 
+/*---------------------ここから----------------------------*/
+//インデント（行のレベル）を変更する関数
+//行を選択した際の処理
+function selected(elem: HTMLElement): void{
+ elem.addEventListener('click', (event) => {
+  const target: HTMLElement = event.target as HTMLElement;
 
-// インデント（行のレベル）を変更する関数
-function changeIndent(isIncrease: boolean) {
-  selectedRows.forEach((row) => {
-    const currentIndent = parseInt(row.style.textIndent) || 0; // 現在のインデントを取得（ない場合は 0）
-    if (!isNaN(currentIndent)) {
-      // 現在のインデントが数値である場合
-      const newIndent = isIncrease ? currentIndent + indentPx : currentIndent - indentPx; // 新しいインデントを計算
-      if (newIndent >= 0 && newIndent <= 3 * indentPx) {
-        // 新しいインデントが許容範囲内である場合
-        row.style.textIndent = newIndent + "px"; // 新しいインデントを設定
-      }
-    }
-  });
+  //クリックされた要素がTDであり、かつ親要素（TR)が存在する場合
+  if (target.tagName === "TD" && target.parentElement) {
+   const row: HTMLElement = target.parentElement;
+   const secondTD_1: HTMLElement | nul = row.querySelector('td:nth-child(2)');
+   const TR: NodeListOf<HTMLElement> = row.querySelectorAll('td');
+
+   if (!event.ctrlKey) {
+    //Ctrlが押されていない場合、一旦全ての行から "ui-selected" クラスを削除
+    const allRows: NodeListOf<HTMLElement> = document.querySelectorAll("tr");
+    allRows.forEach((r) => r.querySelectorAll("td.ui-selected").forEach((td) => td.classList.remove("ui-selected")));
+
+    //Ctrlキーが押されなかった場合、選択された行を解除
+    selectedRows = [];
+   }
+   //クリックされた行に"ui-selected"クラスを追加
+   TR.forEach((td) => td.classList.add("ui-selected"));
+   //クリックされた行の情報を selectedRows に追加
+   selectedRows.push(secondTD_1);
+   console.log(selectedRows);
+  }
+ })
 }
+
+
+/*----------------------ここまで------------------------ */
 
 //時間換算
 function calculateDuration(startDate: Date, endDate: Date): number {

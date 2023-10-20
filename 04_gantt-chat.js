@@ -130,6 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
 //   });
 // }
 // 行を選択した際の処理
+// 行を選択した際の処理
 function selected(elem) {
     elem.addEventListener("click", function (event) {
         var target = event.target;
@@ -142,10 +143,27 @@ function selected(elem) {
                 // Ctrlキーが押されていない場合、一旦すべての行から "ui-selected" クラスを削除
                 var allRows = document.querySelectorAll("tr");
                 allRows.forEach(function (r) { return r.querySelectorAll("td.ui-selected").forEach(function (td) { return td.classList.remove("ui-selected"); }); });
+                // Ctrlキーが押されていない場合、選択された行を空にする
+                selectedRows = [];
             }
             // クリックされた行に "ui-selected" クラスを追加
-            selectedRows = [secondTD_1];
             TR.forEach(function (td) { return td.classList.add("ui-selected"); });
+            // クリックされた行の情報を selectedRows に追加
+            selectedRows.push(secondTD_1);
+        }
+    });
+}
+// インデント（行のレベル）を変更する関数
+function changeIndent(isIncrease) {
+    selectedRows.forEach(function (row) {
+        var currentIndent = parseInt(row.style.textIndent) || 0; // 現在のインデントを取得（ない場合は 0）
+        if (!isNaN(currentIndent)) {
+            // 現在のインデントが数値である場合
+            var newIndent = isIncrease ? currentIndent + indentPx : currentIndent - indentPx; // 新しいインデントを計算
+            if (newIndent >= 0 && newIndent <= 3 * indentPx) {
+                // 新しいインデントが許容範囲内である場合
+                row.style.textIndent = newIndent + "px"; // 新しいインデントを設定
+            }
         }
     });
 }
@@ -169,20 +187,33 @@ function selectRow(target) {
     // 選択された行に ui-selected クラスを追加
     row.classList.add("ui-selected");
 }
-// インデント（行のレベル）を変更する関数
-function changeIndent(isIncrease) {
-    selectedRows.forEach(function (row) {
-        var currentIndent = parseInt(row.style.textIndent) || 0; // 現在のインデントを取得（ない場合は 0）
-        if (!isNaN(currentIndent)) {
-            // 現在のインデントが数値である場合
-            var newIndent = isIncrease ? currentIndent + indentPx : currentIndent - indentPx; // 新しいインデントを計算
-            if (newIndent >= 0 && newIndent <= 3 * indentPx) {
-                // 新しいインデントが許容範囲内である場合
-                row.style.textIndent = newIndent + "px"; // 新しいインデントを設定
+/*---------------------ここから----------------------------*/
+//インデント（行のレベル）を変更する関数
+//行を選択した際の処理
+function selected(elem) {
+    elem.addEventListener('click', function (event) {
+        var target = event.target;
+        //クリックされた要素がTDであり、かつ親要素（TR)が存在する場合
+        if (target.tagName === "TD" && target.parentElement) {
+            var row = target.parentElement;
+            var secondTD_1 = row.querySelector('td:nth-child(2)');
+            var TR = row.querySelectorAll('td');
+            if (!event.ctrlKey) {
+                //Ctrlが押されていない場合、一旦全ての行から "ui-selected" クラスを削除
+                var allRows = document.querySelectorAll("tr");
+                allRows.forEach(function (r) { return r.querySelectorAll("td.ui-selected").forEach(function (td) { return td.classList.remove("ui-selected"); }); });
+                //Ctrlキーが押されなかった場合、選択された行を解除
+                selectedRows = [];
             }
+            //クリックされた行に"ui-selected"クラスを追加
+            TR.forEach(function (td) { return td.classList.add("ui-selected"); });
+            //クリックされた行の情報を selectedRows に追加
+            selectedRows.push(secondTD_1);
+            console.log(selectedRows);
         }
     });
 }
+/*----------------------ここまで------------------------ */
 //時間換算
 function calculateDuration(startDate, endDate) {
     var durationInMilliseconds = endDate.getTime() - startDate.getTime() + 24 * 60 * 60 * 1000;
